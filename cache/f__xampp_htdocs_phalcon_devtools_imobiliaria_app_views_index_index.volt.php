@@ -78,10 +78,8 @@
 			&nbsp;
 
 			<a href="index/create" class="btn btn-light btn-sm" id="botao" title="Cadastre-se para ter acesso ao nosso painel!">Cadastrar-se</a>
-			
 
 		</div>	
-
 
     </div>
     <div class="col-sm">
@@ -89,9 +87,6 @@
     </div>
   </div>
 </div>
-
-
-
 
 </body>
 </html>
