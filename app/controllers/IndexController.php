@@ -35,15 +35,31 @@ class IndexController extends ControllerBase
     			$this->session->set('AUTH_EMAIL', $user->email);
     			$this->session->set('AUTH_PASSWORD', $user->password);
 
-    			$this->flashSession->success('Login realizado com sucesso!');
-                return $this->response->redirect('index/painel');
+    			//$this->flashSession->success('Login realizado com sucesso!');
+
+                $this->getProperty();
+                $this->view->pick("index/painel");//Determinar qual a VIEW será renderizada!
+
     		}else{
     			$this->flashSession->error('Error. Email e/ou Senha errados!');
                 return $this->response->redirect('index/index');
     		}
 
-
     	}	
+
+    }
+
+    public function getProperty(){
+
+        //$imoveis = Imovel::find();
+        $sql = "select imo.tipoImovel, imo.descricao, imo.bairro, imo.localizacao, imo.valor, imob.nome, imob.cidade, imob.email from imovel as imo 
+                join imobiliaria as imob 
+                on imo.imobiliariaid = imob.id ";
+
+        $query = $this->modelsManager->createQuery($sql);
+        $imoveis = $query->execute();
+
+        $this->view->imoveis = $imoveis;//Enviar a variavel $imovel para a VIEW
 
     }
 
@@ -56,6 +72,46 @@ class IndexController extends ControllerBase
 
             $this->view->disable(); //Aqui serve para ler o que está dentro do metodo e não a view 
         }
+
+    }
+
+    public function editarAction($id){
+
+        $user = Users::find($id);
+
+        $this->view->usuario = $user;//Enviar a variavel $user para a VIEW
+        $this->view->pick("index/editar");//Determinar qual a VIEW será renderizada!
+
+    }
+
+    public function atualizarAction(){
+
+        $usuario = new Users();
+
+        $usuario->id = $this->request->getPut('idUser');
+        $usuario->nome = $this->request->getPut('nomeUser');
+        $usuario->email = $this->request->getPut('emailUser');
+        $usuario->password = $this->request->getPut('passwordUser');
+
+        $sucesso = $usuario->save();
+
+        if($sucesso){
+            $this->flashSession->success('Atualizado com sucesso!');
+        }else{
+            echo "Descupe, ocorreu um erro ou atualizar: ";
+
+            $messages = $usuario->getMessages();
+
+            foreach ($messages as $message) {
+                $this->flashSession->error($message->getMessage());
+            }
+
+        }
+
+        $this->getProperty();
+
+        $this->view->pick("index/painel");
+        //$this->response->redirect("index/painel");
 
     }
 
@@ -79,7 +135,6 @@ class IndexController extends ControllerBase
             $this->flashSession->success('Usuário deslogado com sucesso!');
             return $this->response->redirect('index/index');
             
-
         }
 
     }
@@ -119,6 +174,8 @@ class IndexController extends ControllerBase
         return $this->response->redirect('index/create'); 
 
     }
+
+
 
 }
 
